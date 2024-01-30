@@ -9,19 +9,18 @@ public class GhostSpawner : MonoBehaviour
     private readonly int _poolCapacity = 10;
     private readonly int _maxSize = 10;
     
-    private List<GameObject> _spawns;
-    private ObjectPool<GameObject> _pool;
-    private int _currentSpawn;
-    
     [SerializeField] private Ghost _ghostPrefab;
-
+    
+    private List<GameObject> _spawnPoints;
+    private ObjectPool<GameObject> _pool;
+    
     public void AddGhostToPool(GameObject ghost)
     {
         _pool.Release(ghost);
     }
     private void Awake()
     {
-        _spawns = new List<GameObject>();
+        _spawnPoints = new List<GameObject>();
         _pool = new ObjectPool<GameObject>(createFunc: CreateGhost, 
             actionOnGet: SetGhostPosition, 
             actionOnRelease:(obj) => obj.SetActive(false), 
@@ -30,7 +29,7 @@ public class GhostSpawner : MonoBehaviour
             defaultCapacity: _poolCapacity, 
             maxSize: _maxSize);
         
-        GetAllSpawns();
+        GetAllSpawnPoints();
     }
 
     private void Start()
@@ -70,22 +69,27 @@ public class GhostSpawner : MonoBehaviour
         GameObject spawn = GetRandomSpawn();
         
         ghost.transform.position = spawn.transform.position;
-        ghost.transform.rotation = spawn.transform.rotation;
+        ghost.transform.rotation = GetRandomDirection();
     }
     
-    private void GetAllSpawns() 
+    private void GetAllSpawnPoints() 
     {
         foreach (Transform tr in GetComponentsInChildren<Transform>())
         {
             if (tr.GetComponent<SpawnPoint>()) 
-                _spawns.Add(tr.gameObject); 
+                _spawnPoints.Add(tr.gameObject); 
         }
     }
 
     private GameObject GetRandomSpawn()
     {
-        int randomIndex = Random.Range(0, _spawns.Count);
+        int randomIndex = Random.Range(0, _spawnPoints.Count);
 
-        return _spawns[randomIndex];
+        return _spawnPoints[randomIndex];
+    }
+
+    private Quaternion GetRandomDirection()
+    {
+        return Quaternion.Euler(0, Random.Range(0.0f, 360.0f), 0);
     }
 }
