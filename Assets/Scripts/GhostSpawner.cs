@@ -18,6 +18,7 @@ public class GhostSpawner : MonoBehaviour
     {
         _pool.Release(ghost);
     }
+    
     private void Awake()
     {
         _spawnPoints = new List<GameObject>();
