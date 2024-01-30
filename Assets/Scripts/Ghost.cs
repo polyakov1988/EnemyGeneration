@@ -1,5 +1,6 @@
 using UnityEngine;
 
+[RequireComponent(typeof(Animator))]
 public class Ghost : MonoBehaviour
 {
     private readonly string _runClipName = "ghost_run";
@@ -12,7 +13,7 @@ public class Ghost : MonoBehaviour
         _animator = GetComponent<Animator>();
     }
     
-    void Update()
+    private void Update()
     {
         if (_animator.GetCurrentAnimatorClipInfo(0)[0].clip.name != _runClipName)
         {

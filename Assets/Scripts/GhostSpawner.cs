@@ -19,7 +19,7 @@ public class GhostSpawner : MonoBehaviour
     {
         _pool.Release(ghost);
     }
-    void Awake()
+    private void Awake()
     {
         _spawns = new List<GameObject>();
         _pool = new ObjectPool<GameObject>(createFunc: CreateGhost, 
@@ -33,7 +33,7 @@ public class GhostSpawner : MonoBehaviour
         GetAllSpawns();
     }
 
-    void Start()
+    private void Start()
     {
         StartCoroutine(SpawnGhost());
     }
@@ -77,7 +77,7 @@ public class GhostSpawner : MonoBehaviour
     {
         foreach (Transform tr in GetComponentsInChildren<Transform>())
         {
-            if (tr.GetComponent<Spawn>()) 
+            if (tr.GetComponent<SpawnPoint>()) 
                 _spawns.Add(tr.gameObject); 
         }
     }
