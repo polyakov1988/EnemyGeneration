@@ -6,11 +6,11 @@ public class Target : MonoBehaviour
     
     private void OnTriggerEnter(Collider other)
     {
-        Ghost ghost = other.gameObject.GetComponent<Ghost>();
+        Ghost ghost = other.GetComponent<Ghost>();
         
-        if (ghost && ghost.GetTargetName() == name)
+        if (ghost && this == ghost.GetTarget())
         {
-            _ghostSpawner.AddGhostToPool(other.gameObject);
+            _ghostSpawner.AddGhostToPool(ghost);
         }
     }
 }
