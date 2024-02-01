@@ -1,13 +1,28 @@
+using System;
 using UnityEngine;
 
 [RequireComponent(typeof(Animator))]
 public class Ghost : MonoBehaviour
 {
-    private readonly string _runClipName = "ghost_run";
+    private static readonly int HasTargetTrigger = Animator.StringToHash("hasTarget");
+    
     private Animator _animator;
+    private GameObject _target;
 
     [SerializeField] private float _speed;
+    
+    public void SetTarget(GameObject target)
+    {
+        _target = target;
 
+        _animator.SetBool(HasTargetTrigger, true);
+    }
+
+    public String GetTargetName()
+    {
+        return _target ? _target.name : null;
+    }
+    
     private void Awake()
     {
         _animator = GetComponent<Animator>();
@@ -15,11 +30,12 @@ public class Ghost : MonoBehaviour
     
     private void Update()
     {
-        if (_animator.GetCurrentAnimatorClipInfo(0)[0].clip.name != _runClipName)
+        if (!_target)
         {
             return;
         }
         
-        transform.Translate(Vector3.forward * _speed * Time.deltaTime);
+        transform.LookAt(_target.transform);
+        transform.position = Vector3.Lerp(transform.position, _target.gameObject.transform.position, _speed * Time.deltaTime);
     }
 }

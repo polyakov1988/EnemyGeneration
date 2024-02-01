@@ -12,6 +12,7 @@ public class GhostSpawner : MonoBehaviour
     [SerializeField] private Ghost _ghostPrefab;
     
     private List<GameObject> _spawnPoints;
+    private List<GameObject> _targets;
     private ObjectPool<GameObject> _pool;
     
     public void AddGhostToPool(GameObject ghost)
@@ -22,6 +23,8 @@ public class GhostSpawner : MonoBehaviour
     private void Awake()
     {
         _spawnPoints = new List<GameObject>();
+        _targets = new List<GameObject>();
+        
         _pool = new ObjectPool<GameObject>(createFunc: CreateGhost, 
             actionOnGet: SetGhostPosition, 
             actionOnRelease:(obj) => obj.SetActive(false), 
@@ -31,6 +34,7 @@ public class GhostSpawner : MonoBehaviour
             maxSize: _maxSize);
         
         GetAllSpawnPoints();
+        GetAllTargets();
     }
 
     private void Start()
@@ -54,6 +58,7 @@ public class GhostSpawner : MonoBehaviour
                 ghost = CreateGhost();
                 
                 SetGhostPosition(ghost);
+                SetGhostTarget(ghost);
             }
             
             yield return new WaitForSeconds(2);
@@ -67,10 +72,14 @@ public class GhostSpawner : MonoBehaviour
 
     private void SetGhostPosition(GameObject ghost)
     {
-        GameObject spawn = GetRandomSpawn();
+        GameObject spawn = GetRandomSpawnPoint();
         
         ghost.transform.position = spawn.transform.position;
-        ghost.transform.rotation = GetRandomDirection();
+    }
+    
+    private void SetGhostTarget(GameObject ghost)
+    {
+        ghost.GetComponent<Ghost>().SetTarget(GetRandomTarget());
     }
     
     private void GetAllSpawnPoints() 
@@ -81,16 +90,27 @@ public class GhostSpawner : MonoBehaviour
                 _spawnPoints.Add(tr.gameObject); 
         }
     }
+    
+    private void GetAllTargets() 
+    {
+        foreach (Transform tr in GetComponentsInChildren<Transform>())
+        {
+            if (tr.GetComponent<Target>()) 
+                _targets.Add(tr.gameObject); 
+        }
+    }
 
-    private GameObject GetRandomSpawn()
+    private GameObject GetRandomSpawnPoint()
     {
         int randomIndex = Random.Range(0, _spawnPoints.Count);
 
         return _spawnPoints[randomIndex];
     }
-
-    private Quaternion GetRandomDirection()
+    
+    private GameObject GetRandomTarget()
     {
-        return Quaternion.Euler(0, Random.Range(0.0f, 360.0f), 0);
+        int randomIndex = Random.Range(0, _targets.Count);
+
+        return _targets[randomIndex];
     }
 }
